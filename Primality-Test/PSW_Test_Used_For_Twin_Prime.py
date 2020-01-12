@@ -89,8 +89,6 @@ def exp_and_mod(base,exponent,n):
 
 def is_prime(n):
     "first simple check of primality, if inconclusive, go to baillie PSW test"
-    
-    """
     string_n, sum_of_digit = str(n), 0
     if n == 1 or int(string_n[-1])%2 == 0: return False
     if n == 2: return True
@@ -103,7 +101,6 @@ def is_prime(n):
     if(sum_of_digit%3 == 0): return False#rule of 3
     for i in [5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]: # check other small primes
         if n%i == 0 and n != i: return False
-    """
     return baillie_PSW(n) # if the trivial cases above doesnt work, then it goes to the big gun
     
 def jacobi_symbol(a ,p): 
@@ -154,7 +151,6 @@ if lower_limit < 6 and 6 < upper_limit:
     lower_limit = 7
 if lower_limit > 5:
     for odd_number in range(lower_limit,upper_limit+1,2):
-
         if existance_of_twin: existance_of_twin = False
         else:
             if not(odd_number%10 == 3 or odd_number%10 == 5):#skip if the odd number is 3 or 5 because twin prime's last digit cannot have 5.e.g (xxx3, xxx5), (xxx5, xxx7) cannot be the form of a twin prime
