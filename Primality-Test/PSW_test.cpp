@@ -38,7 +38,7 @@ int lucas_test(int n){
 }
 
 int recursive_UV(int P, int Q, int D, int n, int N){
-
+    //stuff
 }
 
 int exp_and_mod(int base, int exponent, n){
@@ -61,9 +61,7 @@ int exp_and_mod(int base, int exponent, n){
 
 }
 
-
 int is_prime(int n){
-
 }
 
 int jacobi_symbol(int a, int p){
@@ -77,7 +75,8 @@ int find_D(int n){
 
 
 int main(){
-
-
+    int* D;
+    int* Q;
+    
     return 0;
 }

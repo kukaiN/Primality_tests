@@ -2,8 +2,11 @@ import math
 import struct
 
 def is_square_type1(num):
-    pass
+    if int(math.sqrt(num))**2 == num:
+        return True
 
+def is_square_type2(num):
+    pass
 
 def fast_inverse_sqrt(num):
     """
@@ -50,7 +53,8 @@ def fast_inverse_sqrt(num):
     
     halfnum = num * 0.5 # this is the initial guess that we will use and it's a pretty good guess
     # newton's method with only one guess
-    return (y * (1.5 - (halfnum * y * y)) 
+    return (y * (1.5 - (halfnum * y * y)))
 
 
-fast_inverse_sqrt(1000)
+num = fast_inverse_sqrt(1000)
+print(num)
