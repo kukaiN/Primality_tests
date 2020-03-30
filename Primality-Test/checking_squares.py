@@ -1,12 +1,47 @@
 import math
 import struct
 
-def is_square_type1(num):
-    if int(math.sqrt(num))**2 == num:
+def is_square1(num):
+    if int(math.sqrt(num) + 0.5)**2 == num:
         return True
+    return False
 
-def is_square_type2(num):
-    pass
+def is_square2(num):
+    # from stackoverflow
+    if num==0: return True
+    while num&3 == 0:    
+        num=num>>2
+    ## Simple bit-logic test. All perfect squares, in binary,
+    ## end in 001, when powers of 4 are factored out.
+    if num&7 != 1: return False
+    if num==1: return True  ## is power of 4, or even power of 2
+
+    ## Simple modulo equivalency test
+    c = num%10
+    if c in {3, 7}: return False  ## Not 1,4,5,6,9 in mod 10
+    if num % 7 in {3, 5, 6}: return False  ## Not 1,2,4 mod 7
+    if num % 9 in {2,3,5,6,8}: return False  
+    if num % 13 in {2,5,6,7,8,11}: return False  
+
+    if c == 5: # if it ends in a 5
+        if (num//10)%10 != 2: return False # then it must end in 25
+        if (num//100)%10 not in {0,2,6}: return False # and in 025, 225, or 625
+        if (num//100)%10 == 6:
+            if (num//1000)%10 not in {0,5}:
+                return False    ## that is, 0625 or 5625
+    else:
+        if (num//10)%4 != 0: return False # (4k)*10 + (1,9)
+
+    ## Babylonian Algorithm. Finding the integer square root.
+    s = (len(str(num))-1) // 2
+    x = (10**s) * 4
+    A = {x, num}
+    while x * x != num:
+        x = (x + (num // x)) >> 1
+        if x in A:
+            return False
+        A.add(x)
+    return True
 
 def fast_inverse_sqrt(num):
     """
@@ -56,5 +91,5 @@ def fast_inverse_sqrt(num):
     return (y * (1.5 - (halfnum * y * y)))
 
 
-num = fast_inverse_sqrt(1000)
-print(num)
+num = 135235598**2
+print(is_square2(num))

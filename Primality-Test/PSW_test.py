@@ -1,18 +1,25 @@
 #******************************************************************************
-# Name: Kukai Nakahata
-
 # to understand the math and what each function is doing, refrence the wiki pages below:
 #https://en.wikipedia.org/wiki/Jacobi_symbol
 #https://en.wikipedia.org/wiki/Baillie%E2%80%93PSW_primality_test
 #https://en.wikipedia.org/wiki/Lucas_pseudoprime
 
-#as a reference to find primes between:
-#[0,100000] it takes ~ 7 sec
-# [0,10000000] it takes ~ 1100 sec(18 min)
 import math
 import time
 
 def baillie_PSW(n):
+    """first simple check of primality, if inconclusive, go to baillie PSW test"""
+    if n < 2 or not (n&1): return False
+    if n == 2: return True
+    if n <= 10000:# for a small n, it checks square roots
+        for a in range(3, int(math.sqrt(n))+1,2): #check all odd number up to sqrt(n)
+            if n%a == 0: return False
+        return True
+    for i in [5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]: # check other small primes
+        if n%i == 0 and n != i: return False
+    
+    # if the trivial cases above doesnt work, then it goes to the big gun
+    
     "This funcion starts the primality tests, first checks Miller-Rabbin then check Lucas test. both checks must be satisfied to be a prime"
     if  miller_rabbin_test(n): #checks miller first, because the calculation is faster and removes most non-primes
         if lucas_test(n):
@@ -64,7 +71,7 @@ def recursive_UV(P,Q, D, n, N):
         return [(U*V)%N, (V**2 + (-2*exp_and_mod(int(Q),int(n),N)))%N]
 
 def exp_and_mod(base,exponent,n): 
-    "return (base ^ exponent) modulo n,  this function is used when trying to find base to the power of a huge number, then do modulo n"
+    "return (base^exponent) modulo n,  this function is used when trying to find base to the power of a huge number, then do modulo n"
     if exponent == 0: return 1
     if exponent%2 == 0: base = abs(base)
     if base == 0 or base == 1: return base
@@ -87,24 +94,6 @@ def exp_and_mod(base,exponent,n):
                 rest = (rest*new_base)%n 
         return (new_base*rest)%n
 
-def is_prime(n):
-    "first simple check of primality, if inconclusive, go to baillie PSW test"
-    
-    """
-    string_n, sum_of_digit = str(n), 0
-    if n == 1 or int(string_n[-1])%2 == 0: return False
-    if n == 2: return True
-    if n <= 10000:# for a small n, it checks square roots
-        for a in range(3,math.floor(math.sqrt(n))+1,2): #check all odd number up to sqrt(n)
-            if n%a == 0: return False
-        return True
-    for j in range(len(string_n)): #check if divisible by 3, using rules of 3
-        sum_of_digit += int(string_n[j])
-    if(sum_of_digit%3 == 0): return False#rule of 3
-    for i in [5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]: # check other small primes
-        if n%i == 0 and n != i: return False
-    """
-    return baillie_PSW(n) # if the trivial cases above doesnt work, then it goes to the big gun
     
 def jacobi_symbol(a ,p): 
     "this is a function that returns the value of jacobi symbol (a,p), p must be prime, returns 0, 1, or -1"
@@ -130,28 +119,34 @@ def find_D(n):
         else: D = (abs(D)+2)
     return [D,(1-D)/4] #return D and Q
 
-lower_limit, upper_limit,highest_value, gap_size = -1, -1, 10**10, 10**9
-print("""This code uses Baillie-PSW test to check primality, and it will return all pairs of twin primes in the range defined by the user
-the defined gap between the limits is {0}; it can be changed by changing the variable \"gap_size\"""".format(gap_size))
-
-
-
-t1 =time.time()
-list_of_twin_primes, existance_of_twin = [], False
-for odd_number in range(lower_limit,upper_limit+1,2):
-    if (odd_number == 3 or odd_number == 5) and odd_number+2 <=upper_limit: list_of_twin_primes.append([odd_number, odd_number+2]) 
-    if existance_of_twin: existance_of_twin = False
+def find_prime_in_range(a, b):
+    
+    if a < 0 or b < 0: 
+        print("both upperbound and lower bound must be greater than zero")
+        return None
+    elif a > b:
+        print("a must be less than b")
+        return None
     else:
-        if not (odd_number%10 == 3 or odd_number%10 == 5):#skip if the odd number is 3 or 5 because twin prime's last digit cannot have 5.e.g (xxx3, xxx5), (xxx5, xxx7) cannot be the form of a twin prime
-            if is_prime(odd_number) and odd_number+2 <= upper_limit:
-                if is_prime(odd_number + 2): 
-                    existance_of_twin = True    
-                    list_of_twin_primes.append([odd_number, odd_number+2])
-                    print(list_of_twin_primes)
-t2 = time.time()
-print("Between the range [{0}, {1}]".format(old_limit, upper_limit))
-if list_of_twin_primes != []:
-    print(list_of_twin_primes)
-    print("The number of twin prime pairs are: {0}".format(len(list_of_twin_primes)))
-else: print("There are no twin primes :(")
-print("it took {0:6f} seconds to find the primes".format(t2-t1))
+        if a < 3: a = 1
+        if not a&1: a+=1
+        current = -1
+        print(a, b)
+        for i in range(a, b, 2):
+            if baillie_PSW(i):
+                past_prime = current
+                current = i
+                if current-past_prime == 2:
+                    yield (past_prime, current)
+
+def main():
+
+    t1 = time.time()
+    a = 100000000
+    for i in find_prime_in_range(a, a+1000000):
+        #print(i)
+        a = 1
+    print(time.time()-t1)
+
+if __name__ == "__main__":
+    main()
